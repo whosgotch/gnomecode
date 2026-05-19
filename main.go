@@ -53,6 +53,19 @@ func main() {
 			continue
 		}
 
+		if msg == ":repo" {
+			repo := inspectRepository()
+			fmt.Printf("Current directory: %s\n", repo.CurrentDir)
+			if repo.IsGitRepo {
+				fmt.Println("Git repository: yes")
+				fmt.Printf("Git root: %s\n", repo.RootDir)
+				fmt.Printf("Files: %d\n", len(repo.TrackedFiles))
+			} else {
+				fmt.Println("Git repository: no")
+			}
+			continue
+		}
+
 		if strings.HasPrefix(msg, ":model ") {
 			model = strings.TrimSpace(strings.TrimPrefix(msg, ":model "))
 			if model == "" {
