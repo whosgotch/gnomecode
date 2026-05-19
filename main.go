@@ -30,6 +30,11 @@ func main() {
 			break
 		}
 
+		if msg == ":help" {
+			printHelp()
+			continue
+		}
+
 		if msg == ":clear" {
 			history = []Message{}
 			fmt.Println("conversation cleared")
@@ -99,4 +104,19 @@ func main() {
 		history = append(history, Message{Role: "user", Content: msg})
 		history = append(history, Message{Role: "assistant", Content: response})
 	}
+}
+
+func printHelp() {
+	fmt.Println("Commands:")
+	fmt.Println("  :help          Show commands")
+	fmt.Println("  :quit          Exit")
+	fmt.Println("  exit           Exit")
+	fmt.Println("  :clear         Clear conversation history")
+	fmt.Println("  :model         Show current model")
+	fmt.Println("  :model NAME    Set current model")
+	fmt.Println("  :models        List Ollama models")
+	fmt.Println("  :repo          Show repository info")
+	fmt.Println("  :files         List tracked files")
+	fmt.Println("  :read PATH     Read a tracked file")
+	fmt.Println("  :search QUERY  Search tracked files")
 }
