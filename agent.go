@@ -106,8 +106,11 @@ func runTool(name string, input string) string {
 	}
 }
 
-func runAgent(task string, model string, baseURL string, maxSteps int) string {
+func runAgent(task string, history []Message, model string, baseURL string, maxSteps int) string {
 	messages := buildAgentMessages(task)
+	if len(history) > 0 {
+		messages = append([]Message{messages[0]}, append(history, messages[1])...)
+	}
 
 	for step := 0; step < maxSteps; step++ {
 		response, err := chat(model, messages, baseURL)

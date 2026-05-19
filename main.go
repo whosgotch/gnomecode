@@ -11,6 +11,7 @@ func main() {
 	reader := bufio.NewReader(os.Stdin)
 	model := "llama3.1"
 	baseURL := "http://localhost:11434"
+	history := []Message{}
 
 	for {
 		fmt.Print("you> ")
@@ -30,6 +31,7 @@ func main() {
 		}
 
 		if msg == ":clear" {
+			history = []Message{}
 			fmt.Println("conversation cleared")
 			continue
 		}
@@ -91,7 +93,10 @@ func main() {
 			continue
 		}
 
-		response := runAgent(msg, model, baseURL, 5)
+		response := runAgent(msg, history, model, baseURL, 5)
 		fmt.Printf("agent> %s\n", response)
+
+		history = append(history, Message{Role: "user", Content: msg})
+		history = append(history, Message{Role: "assistant", Content: response})
 	}
 }
