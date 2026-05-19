@@ -30,6 +30,27 @@ func main() {
 			break
 		}
 
+		if msg == ":clear" {
+			messages = []Message{}
+			fmt.Println("conversation cleared")
+			continue
+		}
+
+		if msg == ":model" {
+			fmt.Printf("model: %s\n", model)
+			continue
+		}
+
+		if strings.HasPrefix(msg, ":model ") {
+			model = strings.TrimSpace(strings.TrimPrefix(msg, ":model "))
+			if model == "" {
+				fmt.Println("error: model name is empty")
+				continue
+			}
+			fmt.Printf("model: %s\n", model)
+			continue
+		}
+
 		messages = append(messages, Message{
 			Role:    "user",
 			Content: msg,
