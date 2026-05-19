@@ -60,6 +60,21 @@ func handleCommand(msg string, state *ChatState) bool {
 		return true
 	}
 
+	if msg == ":status" {
+		repo := inspectRepository()
+		fmt.Printf("model: %s\n", state.Model)
+		fmt.Printf("base URL: %s\n", state.BaseURL)
+		if repo.IsGitRepo {
+			fmt.Println("git: yes")
+			fmt.Printf("repo: %s\n", repo.RootDir)
+			fmt.Printf("files: %d\n", len(repo.TrackedFiles))
+		} else {
+			fmt.Println("git: no")
+		}
+		fmt.Printf("history messages: %d\n", len(state.History))
+		return true
+	}
+
 	if msg == ":repo" {
 		repo := inspectRepository()
 		fmt.Printf("Current directory: %s\n", repo.CurrentDir)
@@ -118,6 +133,7 @@ func printHelp() {
 	fmt.Println("  :model NAME    Set current model")
 	fmt.Println("  :base-url      Show Ollama server URL")
 	fmt.Println("  :base-url URL  Set Ollama server URL")
+	fmt.Println("  :status        Show current session status")
 	fmt.Println("  :models        List Ollama models")
 	fmt.Println("  :repo          Show repository info")
 	fmt.Println("  :files         List tracked files")
