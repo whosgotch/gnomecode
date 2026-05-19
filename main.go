@@ -41,6 +41,18 @@ func main() {
 			continue
 		}
 
+		if msg == ":models" {
+			models, err := listModels(baseURL)
+			if err != nil {
+				fmt.Printf("error: %v\n", err)
+				continue
+			}
+			for _, modelName := range models {
+				fmt.Println(modelName)
+			}
+			continue
+		}
+
 		if strings.HasPrefix(msg, ":model ") {
 			model = strings.TrimSpace(strings.TrimPrefix(msg, ":model "))
 			if model == "" {

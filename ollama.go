@@ -29,6 +29,14 @@ type chatStreamResponse struct {
 	Done    bool    `json:"done"`
 }
 
+type modelsResponse struct {
+	Models []modelInfo `json:"models"`
+}
+
+type modelInfo struct {
+	Name string `json:"name"`
+}
+
 func chat(model string, messages []Message, baseURL string) (string, error) {
 	payload, err := json.Marshal(chatRequest{
 		Model:    model,
@@ -119,4 +127,35 @@ func chatStream(model string, messages []Message, baseURL string, onToken func(s
 	}
 
 	return fullResponse, nil
+}
+
+func listModels(baseURL string) ([]string, error) {
+	resp, err := http.Get(baseURL + "/api/tags")
+	if err != nil {
+		return nil, fmt.Errorf("could not connect to Ollama at %s", baseURL)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("Ollama returned an error: %s", string(body))
+	}
+
+	var parsed modelsResponse
+	if err := json.Unmarshal(body, &parsed); err != nil {
+		return nil, fmt.Errorf("Ollama returned an unexpected response")
+	}
+
+	names := []string{}
+	for _, model := range parsed.Models {
+		if model.Name != "" {
+			names = append(names, model.Name)
+		}
+	}
+
+	return names, nil
 }
