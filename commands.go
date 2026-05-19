@@ -44,6 +44,22 @@ func handleCommand(msg string, state *ChatState) bool {
 		return true
 	}
 
+	if msg == ":base-url" {
+		fmt.Printf("base URL: %s\n", state.BaseURL)
+		return true
+	}
+
+	if strings.HasPrefix(msg, ":base-url ") {
+		baseURL := strings.TrimSpace(strings.TrimPrefix(msg, ":base-url "))
+		if baseURL == "" {
+			fmt.Println("error: base URL is empty")
+			return true
+		}
+		state.BaseURL = baseURL
+		fmt.Printf("base URL: %s\n", state.BaseURL)
+		return true
+	}
+
 	if msg == ":repo" {
 		repo := inspectRepository()
 		fmt.Printf("Current directory: %s\n", repo.CurrentDir)
@@ -100,6 +116,8 @@ func printHelp() {
 	fmt.Println("  :clear         Clear conversation history")
 	fmt.Println("  :model         Show current model")
 	fmt.Println("  :model NAME    Set current model")
+	fmt.Println("  :base-url      Show Ollama server URL")
+	fmt.Println("  :base-url URL  Set Ollama server URL")
 	fmt.Println("  :models        List Ollama models")
 	fmt.Println("  :repo          Show repository info")
 	fmt.Println("  :files         List tracked files")
