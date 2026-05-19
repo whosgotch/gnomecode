@@ -66,6 +66,23 @@ func main() {
 			continue
 		}
 
+		if msg == ":files" {
+			fmt.Println(listFiles())
+			continue
+		}
+
+		if strings.HasPrefix(msg, ":read ") {
+			path := strings.TrimSpace(strings.TrimPrefix(msg, ":read "))
+			fmt.Println(readFile(path))
+			continue
+		}
+
+		if strings.HasPrefix(msg, ":search ") {
+			query := strings.TrimSpace(strings.TrimPrefix(msg, ":search "))
+			fmt.Println(search(query))
+			continue
+		}
+
 		if strings.HasPrefix(msg, ":model ") {
 			model = strings.TrimSpace(strings.TrimPrefix(msg, ":model "))
 			if model == "" {
