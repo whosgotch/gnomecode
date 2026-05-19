@@ -36,10 +36,9 @@ func main() {
 			continue
 		}
 
-		response := runAgent(msg, state.History, state.Model, state.BaseURL, 5)
-		fmt.Printf("agent> %s\n", response)
+		result := runAgent(msg, state.History, state.Model, state.BaseURL, 5)
+		fmt.Printf("agent> %s\n", result.Answer)
 
-		state.History = append(state.History, Message{Role: "user", Content: msg})
-		state.History = append(state.History, Message{Role: "assistant", Content: response})
+		state.History = append(state.History, result.Messages...)
 	}
 }

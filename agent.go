@@ -106,8 +106,14 @@ func runTool(name string, input string) string {
 	}
 }
 
-func runAgent(task string, history []Message, model string, baseURL string, maxSteps int) string {
+type AgentResult struct {
+	Answer   string
+	Messages []Message
+}
+
+func runAgent(task string, history []Message, model string, baseURL string, maxSteps int) AgentResult {
 	messages := buildAgentMessages(task)
+	taskMessages := []Message{{Role: "user", Content: task}}
 	if len(history) > 0 {
 		messages = append([]Message{messages[0]}, append(history, messages[1])...)
 	}
@@ -115,12 +121,15 @@ func runAgent(task string, history []Message, model string, baseURL string, maxS
 	for step := 0; step < maxSteps; step++ {
 		response, err := chat(model, messages, baseURL)
 		if err != nil {
-			return fmt.Sprintf("Error: %v", err)
+			answer := fmt.Sprintf("Error: %v", err)
+			taskMessages = append(taskMessages, Message{Role: "assistant", Content: answer})
+			return AgentResult{Answer: answer, Messages: taskMessages}
 		}
 
 		parsed := parseAgentResponse(response)
 		if parsed.Kind == "final" {
-			return parsed.Text
+			taskMessages = append(taskMessages, Message{Role: "assistant", Content: parsed.Text})
+			return AgentResult{Answer: parsed.Text, Messages: taskMessages}
 		}
 
 		if parsed.Kind == "action" {
@@ -135,13 +144,15 @@ func runAgent(task string, history []Message, model string, baseURL string, maxS
 			if parsed.Input != "" {
 				toolLabel += " " + parsed.Input
 			}
+			toolResult := fmt.Sprintf("TOOL RESULT FROM %s:\n%s", toolLabel, result)
 			messages = append(messages, Message{Role: "assistant", Content: response})
-			messages = append(messages, Message{
-				Role:    "user",
-				Content: fmt.Sprintf("TOOL RESULT FROM %s:\n%s", toolLabel, result),
-			})
+			messages = append(messages, Message{Role: "user", Content: toolResult})
+			taskMessages = append(taskMessages, Message{Role: "assistant", Content: response})
+			taskMessages = append(taskMessages, Message{Role: "user", Content: toolResult})
 		}
 	}
 
-	return "Error: agent reached max steps"
+	answer := "Error: agent reached max steps"
+	taskMessages = append(taskMessages, Message{Role: "assistant", Content: answer})
+	return AgentResult{Answer: answer, Messages: taskMessages}
 }
