@@ -12,10 +12,6 @@ type ChatState struct {
 }
 
 func handleCommand(msg string, state *ChatState) bool {
-	if msg == ":quit" || msg == "exit" {
-		return false
-	}
-
 	if msg == ":help" {
 		printHelp()
 		return true
